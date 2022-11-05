@@ -1,0 +1,37 @@
+randomize;
+
+> main() {
+    score = 0;
+
+    [
+        temp = rand(0, 1);
+        
+        ? temp = 1:
+            operator = "+";
+        :
+            operator = "-";
+        ?;
+
+        t1 = rand(1, 100);
+        t2 = rand(1, 100);
+        query = t1 & " " & operator & " " & t2;
+        result = eval(query);
+        ,input : "What's " & query & vbcrlf & "You have " & score & " point(s)";
+
+        ? input - result = 0:
+            ."Correct";
+            +score;
+        :? input = "":
+            /;
+        : ."Incorrect. The answer was " & result;
+        ?;
+    ]
+
+    ."Thanks for playing";
+}
+
+> rand(min, max) {
+    < int((max - min + 1) * rnd + min);
+}
+
+main();
