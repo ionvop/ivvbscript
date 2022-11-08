@@ -29,7 +29,7 @@ If no argument is given, it will display the list of arguments that can be used 
 
 Display a dialogue box message.
 
-`.<message>`
+`.<message>;`
 
 `message` Message to be displayed.
 
@@ -46,9 +46,9 @@ Example:
 
 Prompt for user input.
 
-`,<variable>`
+`,<variable>;`
 
-`,<variable> : <prompt>`
+`,<variable> : <prompt>;`
 
 `variable` The variable to be assigned.
 
