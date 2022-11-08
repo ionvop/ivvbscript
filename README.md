@@ -262,14 +262,14 @@ Repeat a block of statements a given number of times.
 
 ## Changelog
 
-### v1.1.0 2022-11-08
+### 2022-11-08 v1.1.0
 
 - Added a help section that displays when no argument is entered.
 - Added an output argument `-o` that saves the transpiled code to a file path.
 - Changed the VBScript statement used for the print syntax `.<variable>;` from `wscript.echo(<variable>)` to `msgbox(<variable>)`
 - Changed a phrase in the transpilation error message from `Compilation error in line:` to `Transpilation error in statement:`
 
-### v1.0.0 2022-11-05
+### 2022-11-05 v1.0.0
 
 - Created this project as a Java practice material for CCE101 and a potential submission for my final exam.
 - Released to GitHub.
