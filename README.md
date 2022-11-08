@@ -180,7 +180,7 @@ Repeat a block of statements.
 
 Assign an object reference.
 
-`# <variable> : <object>`
+`# <variable> : <object>;`
 
 `variable` The variable to be assigned.
 
