@@ -116,7 +116,7 @@ Define a function procedure.
 ```
 > <name>(<parameters>) {
     <statements>
-    <<expression>;
+    < <expression>;
 }
 ```
 
