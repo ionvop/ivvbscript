@@ -1,6 +1,28 @@
 # ivvbscript
 A VBScript transpiler made in Java for a custom language I made
 
+## Usage
+
+### Command-line
+
+`cd "c:\<projectDirectory>\" && javac Program.java && java Program`
+
+### Arguments
+
+`-i <filePath>` Sets the path of the source code to be transpiled.
+
+`-o <filePath>` Sets the path where the transpiled code will be written to. If not declared, the program will run directly from its source code.
+
+`-p` Prints the entire transpiled code to the terminal.
+
+If only one argument is given, it will be treated as the path of the source code to be transpiled.
+
+If no argument is given, it will display the list of arguments that can be used in this program.
+
+### Running the source code
+
+`cd "c:\<projectDirectory>\" && javac Program.java && java Program "c:\fileDirectory\program.ivvbs"`
+
 ## Documentation
 
 ### Print
@@ -237,3 +259,17 @@ Repeat a block of statements a given number of times.
     <statement>
 ]
 ```
+
+## Changelog
+
+### v1.1.0
+
+- Added a help section that displays when no argument is entered.
+- Added an output argument `-o` that saves the transpiled code to a file path.
+- Changed the VBScript statement used for the print syntax `.<variable>;` from `wscript.echo(<variable>)` to `msgbox(<variable>)`
+- Changed a word on the transpilation error from `Compilation` to `Transpilation`
+
+### v1.0.0
+
+- Created this project as a Java practice material for CCE101 and a potential submission for my final exam.
+- Released to GitHub.
