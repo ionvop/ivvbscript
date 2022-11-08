@@ -267,7 +267,7 @@ Repeat a block of statements a given number of times.
 - Added a help section that displays when no argument is entered.
 - Added an output argument `-o` that saves the transpiled code to a file path.
 - Changed the VBScript statement used for the print syntax `.<variable>;` from `wscript.echo(<variable>)` to `msgbox(<variable>)`
-- Changed a word on the transpilation error from `Compilation` to `Transpilation`
+- Changed a phrase in the transpilation error message from `Compilation error in line:` to `Transpilation error in statement:`
 
 ### v1.0.0
 
