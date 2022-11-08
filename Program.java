@@ -1,26 +1,18 @@
+//Temporarily reverted to v1.0.0 for historical purposes
+
 import java.io.*;
 import java.nio.file.Paths;
 
 public class Program {
     public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException {
         //String directory = System.getProperty("user.dir");
-        String input = "";
-        String outputPath = "";
+        String input;
         //input = "F:\\Ionvop\\Documents\\VSCode Projects\\ionscript\\test.iscript";
 
-        switch (args.length) {
-            case 0:
-                p.print("ivvbscript v1.1.0 by Ionvop");
-                p.print("-i <filePath> //Sets the path of the source code to be transpiled.");
-                p.print("-o <filePath> //Sets the path where the transpiled code will be written to. If not declared, the program will run directly from its source code.");
-                p.print("-p //Prints the entire transpiled code.");
-                return;
-            case 1:
-                input = args[0];
-                break;
-            default:
-                input = getCommand(args, "-i");
-                outputPath = getCommand(args, "-o");
+        if (args.length == 1) {
+            input = args[0];
+        } else {
+            input = getCommand(args, "-i");
         }
 
         String inputFolder = Paths.get(input).getParent().toString();
@@ -40,15 +32,10 @@ public class Program {
             p.print(transpiledCode);
         }
     
-        if (findArray(args, "-o") != -1) {
-            fso.overwriteFile(outputPath, transpiledCode);
-            p.print("Successfully transpiled to: " + outputPath);
-        } else {
-            fso.overwriteFile(inputFolder + "\\compiled.vbs", transpiledCode);
-            Runtime.getRuntime().exec(new String[] {"C:\\Windows\\System32\\wscript.exe", "\"" + inputFolder + "\\compiled.vbs\""});
-            Thread.sleep(1000);
-            fso.deleteFile(inputFolder + "\\compiled.vbs");
-        }
+        fso.overwriteFile(inputFolder + "\\compiled.vbs", transpiledCode);
+        Runtime.getRuntime().exec(new String[] {"C:\\Windows\\System32\\wscript.exe", "\"" + inputFolder + "\\compiled.vbs\""});
+        Thread.sleep(1000);
+        fso.deleteFile(inputFolder + "\\compiled.vbs");
     }
 
     private static Print p = new Print();
@@ -109,7 +96,7 @@ public class Program {
                     if (input.substring(0, 1).equals(".")) {
                         parameter = input.substring(1);
                         parameter = transpile(parameter);
-                        return "msgbox(" + parameter + ")";
+                        return "wscript.echo(" + parameter + ")";
                     } else if (input.substring(0, 1).equals(",")) {
                         if (input.indexOf(":") == -1) {
                             variable = input.substring(1);
@@ -183,7 +170,7 @@ public class Program {
                     }
             }
         } catch(Exception e) {
-            p.print("Transpilation error in statement: \"" + input + ";\"");
+            p.print("Compilation error in line: \"" + input + ";\"");
         }
 
         return input;
