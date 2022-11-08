@@ -48,7 +48,7 @@ Prompt for user input.
 
 `,<variable>`
 
-`,<variable>:<prompt>`
+`,<variable> : <prompt>`
 
 `variable` The variable to be assigned.
 
