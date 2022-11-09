@@ -1,5 +1,5 @@
 # ivvbscript
-A VBScript transpiler made in Java for a custom language I made
+A VBScript transpiler made in Java (a shitty programming language full of boilerplates and unnecessarily long syntaxes) for a custom language I made
 
 ## Usage
 
@@ -271,5 +271,5 @@ Repeat a block of statements a given number of times.
 
 ### 2022-11-05 v1.0.0
 
-- Created this project as a Java practice material for CCE101 and a potential submission for my final exam.
+- Created this project as a my first Java program and a practice material for CCE101, and a potential submission for my final exam.
 - Released to GitHub.
