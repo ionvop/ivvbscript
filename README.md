@@ -271,5 +271,5 @@ Repeat a block of statements a given number of times.
 
 ### 2022-11-05 v1.0.0
 
-- Created this project as a my first Java program and a practice material for CCE101, and a potential submission for my final exam.
+- Created this project as my first Java program and a practice material for CCE101, and a potential submission for my final exam.
 - Released to GitHub.
