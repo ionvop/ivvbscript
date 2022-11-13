@@ -281,9 +281,9 @@ x = "Hello, world!";
 
 `@e;` Option explicit. 	Forces all variables to be declared.
 
-`@c;` Transpiles the source code as cscript for console.
+`@c;` Transpiles the source code as cscript for terminal.
 
-`@p;` Prints the entire transpiled code to the console.
+`@p;` Prints the entire transpiled code to the terminal.
 
 ```
 @e;
@@ -363,8 +363,9 @@ Repeat a block of statements a given number of times.
 - Added a statement `> <variables>;` without `{ }` as an alternative for the statement `dim` when declaring a new variable.
 - Added a statement `@e` as an alternative for `option explicit` statement when forcing all variables to be declared.
 - Added a statement `@c` as an alternative for adding `-c` in the arguments when transpiling the source code as cscript.
-- Added a statement `@p` as an alternative for adding `-p` in the arguments when printing the entire transpiled code to the console.
+- Added a statement `@p` as an alternative for adding `-p` in the arguments when printing the entire transpiled code to the terminal.
 - Added a new literal `` ` ` `` which has a similar function as template literals in JavaScript.
+- Added `run.vbs` in the sample folder to easily transpile and run a file within the directory without having to type the command in the terminal.
 - Made some small optimizations
 
 ### 2022-11-08 v1.1.0
