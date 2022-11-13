@@ -1,5 +1,5 @@
 # ivvbscript
-A VBScript transpiler made in a shitty programming language full of boilerplates and unnecessarily long syntaxes called Java for a shitty custom language full of unreadable and unnecessarily short syntaxes that I made.
+A VBScript transpiler made in a shitty programming language full of boilerplates and unnecessarily long syntaxes called Java for a shitty custom language full of unintuitive and unnecessarily short syntaxes that I made.
 
 ## Usage
 
@@ -366,7 +366,7 @@ Repeat a block of statements a given number of times.
 - Added a statement `@p` as an alternative for adding `-p` in the arguments when printing the entire transpiled code to the terminal.
 - Added a new literal `` ` ` `` which has a similar function as template literals in JavaScript.
 - Added `run.vbs` in the sample folder to easily transpile and run a file within the directory without having to type the command in the terminal.
-- Made some small optimizations
+- Made some small optimizations.
 
 ### 2022-11-08 v1.1.0
 
