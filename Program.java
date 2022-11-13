@@ -3,7 +3,7 @@ import java.nio.file.Paths;
 
 public class Program {
     public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException {
-        //String directory = System.getProperty("user.dir");
+        String directory = System.getProperty("user.dir");
         String input = "";
         String outputPath = "";
 
@@ -13,6 +13,7 @@ public class Program {
                 p.print("-i <filePath> //Sets the path of the source code to be transpiled.");
                 p.print("-o <filePath> //Sets the path where the transpiled code will be written to. If not declared, the program will run directly from its source code.");
                 p.print("-p //Prints the entire transpiled code.");
+                p.print("-c //Transpiles the source code as cscript for console.");
                 return;
             case 1:
                 input = args[0];
@@ -20,8 +21,18 @@ public class Program {
             default:
                 input = getCommand(args, "-i");
                 outputPath = getCommand(args, "-o");
+
+                if (findArray(args, "-c") != -1) {
+                    isConsole = true;
+                }
+
+                if (findArray(args, "-p") != -1) {
+                    isPrinted = true;
+                }
         }
 
+        String inputFileName = Paths.get(input).getFileName().toString();
+        inputFileName = inputFileName.substring(0, inputFileName.lastIndexOf("."));
         String inputFolder = Paths.get(input).getParent().toString();
         ionFSO fso = new ionFSO();
         String content = fso.openFile(input);
@@ -32,10 +43,10 @@ public class Program {
         String transpiledCode = "";
 
         for (String element : untranspiledCode) {
-            transpiledCode = transpiledCode + transpile(element) + "\r\n";
+            transpiledCode += transpile(element) + "\r\n";
         }
 
-        if (findArray(args, "-p") != -1) {
+        if (isPrinted) {
             p.print(transpiledCode);
         }
     
@@ -43,14 +54,27 @@ public class Program {
             fso.overwriteFile(outputPath, transpiledCode);
             p.print("Successfully transpiled to: " + outputPath);
         } else {
-            fso.overwriteFile(inputFolder + "\\compiled.vbs", transpiledCode);
-            Runtime.getRuntime().exec(new String[] {"C:\\Windows\\System32\\wscript.exe", "\"" + inputFolder + "\\compiled.vbs\""});
+            fso.overwriteFile(inputFolder + "\\" + inputFileName + ".vbs", transpiledCode);
+
+            if (isConsole) {
+                fso.overwriteFile(directory + "\\run.vbs", "CreateObject(\"WScript.Shell\").run(\"%comspec% /k cscript \"\"" + inputFolder + "\\" + inputFileName + ".vbs\"\"\")");
+                Runtime.getRuntime().exec(new String[] {"C:\\Windows\\System32\\wscript.exe ", "\"" + directory + "\\run.vbs\""});
+                Thread.sleep(1000);
+                fso.deleteFile(directory + "\\run.vbs");
+            } else {
+                Runtime.getRuntime().exec(new String[] {"C:\\Windows\\System32\\wscript.exe ", "\"" + inputFolder + "\\" + inputFileName + ".vbs\""});
+            }
+
             Thread.sleep(1000);
-            fso.deleteFile(inputFolder + "\\compiled.vbs");
+            fso.deleteFile(inputFolder + "\\" + inputFileName + ".vbs");
         }
     }
 
     private static Print p = new Print();
+
+    private static Boolean isConsole = false;
+
+    private static Boolean isPrinted = false;
 
     private static String getCommand(String[] input, String command) {
         var temp = findArray(input, command);
@@ -108,19 +132,34 @@ public class Program {
                     if (input.substring(0, 1).equals(".")) {
                         parameter = input.substring(1);
                         parameter = transpile(parameter);
-                        return "msgbox(" + parameter + ")";
-                    } else if (input.substring(0, 1).equals(",")) {
-                        if (input.indexOf(":") == -1) {
-                            variable = input.substring(1);
-                            variable = transpile(variable);
-                            return variable + " = inputbox(\"\")";
+
+                        if (isConsole) {
+                            return "wscript.echo(" + parameter + ")";
                         }
 
-                        variable = input.substring(1, input.indexOf(":"));
+                        return "msgbox(" + parameter + ")";
+                    } else if (input.substring(0, 1).equals(",")) {
+                        if (input.contains(":")) {
+                            variable = input.substring(1, input.indexOf(":"));
+                            variable = transpile(variable);
+                            parameter = input.substring(input.indexOf(":") + 1);
+                            parameter = transpile(parameter);
+
+                            if (isConsole) {
+                                return "wscript.echo(" + parameter + ")\r\n" + variable + " = WScript.StdIn.ReadLine()";
+                            }
+
+                            return variable + " = inputbox(" + parameter + ")";
+                        }
+
+                        variable = input.substring(1);
                         variable = transpile(variable);
-                        parameter = input.substring(input.indexOf(":") + 1);
-                        parameter = transpile(parameter);
-                        return variable + " = inputbox(" + parameter + ")";
+
+                        if (isConsole) {
+                            return variable + " = WScript.StdIn.ReadLine()";
+                        }
+
+                        return variable + " = inputbox(\"\")";
                     } else if (input.substring(0, 2).equals(":?")) {
                         condition = input.substring(2, input.indexOf(":", 2));
                         condition = transpile(condition);
@@ -146,13 +185,19 @@ public class Program {
                         variable = transpile(variable);
                         return variable + " = " + variable + " - 1";
                     } else if (input.substring(0, 1).equals(">")) {
-                        parameter = input.substring(1, input.indexOf("{"));
+                        if (input.contains("{")) {
+                            parameter = input.substring(1, input.indexOf("{"));
+                            parameter = transpile(parameter);
+                            currentFunction = parameter.substring(0, parameter.indexOf("("));
+                            currentFunction = transpile(currentFunction);
+                            statement = input.substring(input.indexOf("{") + 1);
+                            statement = transpile(statement);
+                            return "function " + parameter + "\r\n" + statement;
+                        }
+                        
+                        parameter = input.substring(1);
                         parameter = transpile(parameter);
-                        currentFunction = parameter.substring(0, parameter.indexOf("("));
-                        currentFunction = transpile(currentFunction);
-                        statement = input.substring(input.indexOf("{") + 1);
-                        statement = transpile(statement);
-                        return "function " + parameter + "\r\n" + statement;
+                        return "dim " + parameter;
                     } else if (input.substring(0, 1).equals("<")) {
                         parameter = input.substring(1);
                         parameter = transpile(parameter);
@@ -176,15 +221,149 @@ public class Program {
                         parameter = transpile(parameter);
                         return "set " + variable + " = CreateObject(" + parameter + ")";
                     } else if (input.substring(0, 1).equals("=")) {
+                        if (input.contains(":")) {
+                            variable = input.substring(1, input.indexOf(":"));
+                            variable = transpile(variable);
+                            parameter = input.substring(input.indexOf(":") + 1);
+                            parameter = transpile(parameter);
+                            return variable + " = " + parameter;
+                        }
+
                         parameter = input.substring(1);
                         parameter = transpile(parameter);
                         return "eval(" + parameter + ")";
+                    } else if (input.contains("`")) {
+                        return scan(input);
+                    } else if (input.equals("@c")) {
+                        isConsole = true;
+                        return "";
+                    } else if (input.equals("@e")) {
+                        return "option explicit";
+                    } else if (input.equals("@p")) {
+                        isPrinted = true;
+                        return "";
                     }
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             p.print("Transpilation error in statement: \"" + input + ";\"");
         }
 
         return input;
+    }
+
+    private static String scan(String input) {
+        String currentState = "normal";
+        char element = ' ';
+        String scannedInput = "";
+
+        try {
+            for (int i = 0; i < input.length(); i++) {
+                element = input.charAt(i);
+
+                switch (element) {
+                    case '\"':
+                        switch (currentState) {
+                            case "normal":
+                                currentState = "string";
+                                scannedInput += "\"";
+                                break;
+                            case "string":
+                                currentState = "normal";
+                                scannedInput += "\"";
+                                break;
+                            case "template":
+                                scannedInput += "\"\"";
+                                break;
+                            default:
+                                scannedInput += "\"";
+                        }
+                        
+                        break;
+                    case '`':
+                        switch (currentState) {
+                            case "normal":
+                                currentState = "template";
+                                scannedInput += "\"";
+                                break;
+                            case "template":
+                                currentState = "normal";
+                                scannedInput += "\"";
+                                break;
+                            case "escape":
+                                currentState = "template";
+                                scannedInput += "`";
+                                break;
+                            default:
+                                scannedInput += "`";
+                        }
+
+                        break;
+                    case '{':
+                        switch (currentState) {
+                            case "template":
+                                scannedInput += "\" & ";
+                                break;
+                            case "escape":
+                                currentState = "template";
+                                scannedInput += "{";
+                                break;
+                            default:
+                                scannedInput += "{";
+                        }
+
+                        break;
+                    case '}':
+                        switch (currentState) {
+                            case "template":
+                                scannedInput += " & \"";
+                                break;
+                            case "escape":
+                                currentState = "template";
+                                scannedInput += "}";
+                                break;
+                            default:
+                                scannedInput += "}";
+                        }
+
+                        break;
+                    case '\\':
+                        switch (currentState) {
+                            case "template":
+                                switch (input.charAt(i + 1)) {
+                                    case '`':
+                                        currentState = "escape";
+                                        break;
+                                    case '{':
+                                        currentState = "escape";
+                                        break;
+                                    case '}':
+                                        currentState = "escape";
+                                        break;
+                                    case '\\':
+                                        currentState = "escape";
+                                        break;
+                                    default:
+                                        scannedInput += "\\";
+                                }
+
+                                break;
+                            case "escape":
+                                currentState = "template";
+                                scannedInput += "\\";
+                                break;
+                            default:
+                                scannedInput += "\\";
+                        }
+
+                        break;
+                    default:
+                        scannedInput += element;
+                }
+            }
+        } catch (Exception e) {
+            p.print("Transpilation error in statement: \"" + input + ";\"");
+        }
+
+        return scannedInput;
     }
 }
