@@ -25,6 +25,8 @@ If no argument is given, it will display the list of arguments that can be used 
 
 ## Documentation
 
+Due to the limitations of my smol brain, it's required that every statement terminators `;` must follow with a newline, otherwise it will not work.
+
 ### Print
 
 Display a dialogue box message.
@@ -61,7 +63,7 @@ Example:
 .input;
 ```
 
-### Comments
+### Comment
 
 Add a comment.
 
@@ -109,7 +111,28 @@ Example:
 ?;
 ```
 
-### Functions
+### Dim
+
+Declare a new variable or array variable within a scope.
+
+`> <variables>`
+
+`variables` The variables to be declared.
+
+Example:
+
+```
+> var1, var2;
+var1 = 7;
+var2 = 4;
+
+> add() {
+    > var3;
+    var3 = var1 + var2;
+}
+```
+
+### Function
 
 Define a function procedure.
 
@@ -163,7 +186,7 @@ y = 5;
 'Displays 4;
 ```
 
-### Loops
+### Loop
 
 Repeat a block of statements.
 
@@ -176,7 +199,7 @@ Repeat a block of statements.
 
 `statements` Program code to be repeated until `/;` is called.
 
-### Objects
+### Object
 
 Assign an object reference.
 
@@ -197,15 +220,44 @@ objShell.Run("notepad.exe");
 
 Evaluate an expression.
 
-`=<expression>;`
+`= <expression>;`
 
-`expression` Any expression that returns a string or a number.
+`expression` A string expression that returns a value.
 
 Example:
 
 ```
 x = "7 + 4";
 .=x;
+'Displays 11;
+```
+
+### Assign
+
+Assign a value to a variable.
+
+`= <variable> : <value>;`
+
+`variable` The variable to be assigned.
+
+`value` The value that is assigned to the variable.
+
+Example:
+
+```
+= x : "Hello, world!";
+.x;
+'Displays "Hello, world!";
+```
+
+This is usually used with the eval statement.
+
+```
+var1 = 7;
+var2 = 4;
+var3 = "var1 + var2";
+= result : = var3;
+.result;
 'Displays 11;
 ```
 
@@ -223,6 +275,47 @@ x = "Hello, world!";
 
 'Unreachable code;
 .x;
+```
+
+### Options
+
+`@e;` Option explicit. 	Forces all variables to be declared.
+
+`@c;` Transpiles the source code as cscript for console.
+
+`@p;` Prints the entire transpiled code to the console.
+
+```
+@e;
+x = 1;
+.x;
+'Displays an error because x has not been declared yet before using;
+
+@e;
+> x;
+x = 1;
+.x;
+'Displays 1;
+```
+
+### Template literal
+
+Easily use double quotes and interpolate variables and expressions into a string.
+
+`` `<text>{<expression>}` ``
+
+`text` Text written into the string.
+
+`expression` Variables or expressions to be interpolated into the string.
+
+To use the special template characters `` ` `` `{` `}` `\` as a string character, use the escape character `\` before them. If no special characters are next to `\`, then it will act as a string character.
+
+Example:
+
+```
+var1 = "fox";
+var2 = "dog";
+.`The quick brown {var1} "jumps" over the lazy {var2}`;
 ```
 
 ## Loop techniques
@@ -262,11 +355,23 @@ Repeat a block of statements a given number of times.
 
 ## Changelog
 
+### 2022-11-13 v1.2.0
+
+- Added an argument command `-c` for transpiling the source code as cscript.
+- Changed the default output filename of the transpiled code from `compiled.vbs` to the filename of the source code. This may overwrite and delete any existing `.vbs` files in the directory with the same filename.
+- Added a statement `= <variables> : <parameters>;` as an alternative for assigning variables which supports the eval statement `= <expression>` within the parameters.
+- Added a statement `> <variables>;` without `{ }` as an alternative for the statement `dim` when declaring a new variable.
+- Added a statement `@e` as an alternative for `option explicit` statement when forcing all variables to be declared.
+- Added a statement `@c` as an alternative for adding `-c` in the arguments when transpiling the source code as cscript.
+- Added a statement `@p` as an alternative for adding `-p` in the arguments when printing the entire transpiled code to the console.
+- Added a new literal `` ` ` `` which has a similar function as template literals in JavaScript.
+- Made some small optimizations
+
 ### 2022-11-08 v1.1.0
 
 - Added a help section that displays when no argument is entered.
 - Added an output argument `-o` that saves the transpiled code to a file path.
-- Changed the VBScript statement used for the print syntax `.<variable>;` from `wscript.echo(<variable>)` to `msgbox(<variable>)`
+- Changed the VBScript statement used for the print statement `.<variable>;` from `wscript.echo(<variable>)` to `msgbox(<variable>)`
 - Changed a phrase in the transpilation error message from `Compilation error in line:` to `Transpilation error in statement:`
 
 ### 2022-11-05 v1.0.0
