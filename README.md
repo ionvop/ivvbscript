@@ -15,6 +15,8 @@ A VBScript transpiler made in a shitty programming language full of boilerplates
 
 `-p` Prints the entire transpiled code to the terminal.
 
+`-c` Transpiles the source code as cscript for console.
+
 If only one argument is given, it will be treated as the path of the source code to be transpiled.
 
 If no argument is given, it will display the list of arguments that can be used in this program.
