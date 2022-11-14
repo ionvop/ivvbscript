@@ -77,7 +77,7 @@ public class Program {
     private static Boolean isPrinted = false;
 
     private static String getCommand(String[] input, String command) {
-        var temp = findArray(input, command);
+        int temp = findArray(input, command);
 
         if (temp == -1) {
             return "";
