@@ -19,8 +19,8 @@ public class Program {
                 input = args[0];
                 break;
             default:
-                input = getCommand(args, "-i");
-                outputPath = getCommand(args, "-o");
+                input = getParameter(args, "-i");
+                outputPath = getParameter(args, "-o");
 
                 if (findArray(args, "-c") != -1) {
                     isConsole = true;
@@ -34,17 +34,20 @@ public class Program {
         String inputFileName = Paths.get(input).getFileName().toString();
         inputFileName = inputFileName.substring(0, inputFileName.lastIndexOf("."));
         String inputFolder = Paths.get(input).getParent().toString();
-        ionFSO fso = new ionFSO();
         String content = fso.openFile(input);
         content += "\r\n";
-        content = content.replaceAll(";\r", ";177013");
-        content = content.replaceAll(";\n", ";177013");
-        String[] untranspiledCode = content.split("\\;177013");
+        content = content.replaceAll("\\\\\r\n", "");
+        content = content.replaceAll("\\\\;", "177013escapedsemicolon");
+        content = content.replaceAll("\\\\:", "177013escapedcolon");
+        String[] untranspiledCode = content.split(";");
         String transpiledCode = "";
 
         for (String element : untranspiledCode) {
             transpiledCode += transpile(element) + "\r\n";
         }
+
+        transpiledCode = transpiledCode.replaceAll("177013escapedsemicolon", ";");
+        transpiledCode = transpiledCode.replaceAll("177013escapedcolon", ":");
 
         if (isPrinted) {
             p.print(transpiledCode);
@@ -72,11 +75,13 @@ public class Program {
 
     private static Print p = new Print();
 
+    private static ionFSO fso = new ionFSO();
+
     private static Boolean isConsole = false;
 
     private static Boolean isPrinted = false;
 
-    private static String getCommand(String[] input, String command) {
+    private static String getParameter(String[] input, String command) {
         int temp = findArray(input, command);
 
         if (temp == -1) {
@@ -110,6 +115,12 @@ public class Program {
         input = input.strip();
 
         try {
+            input = input.strip();
+        } catch (Exception e) {
+            input = input.trim();
+        }
+
+        try {
             switch (input.length()) {
                 case 0:
                     return input;
@@ -126,122 +137,135 @@ public class Program {
                         case "!":
                             return "wscript.quit";
                     }
-
-                    break;
+                case 2:
+                    switch (input) {
+                        case "@c":
+                            isConsole = true;
+                            return "'Set as a console script";
+                        case "@e":
+                            return "option explicit";
+                        case "@p":
+                            isPrinted = true;
+                            return "'Is printed to terminal";
+                    }
                 default:
-                    if (input.substring(0, 1).equals(".")) {
-                        parameter = input.substring(1);
-                        parameter = transpile(parameter);
-
-                        if (isConsole) {
-                            return "wscript.echo(" + parameter + ")";
+                    if (input.length() > 2) {
+                        switch (input.substring(0, 2)) {
+                            case ":?":
+                                condition = input.substring(2, input.indexOf(":", 2));
+                                condition = transpile(condition);
+                                statement = input.substring(input.indexOf(":", 2) + 1);
+                                statement = transpile(statement);
+                                return "elseif " + condition + " then\r\n" + statement;
                         }
+                    }
 
-                        return "msgbox(" + parameter + ")";
-                    } else if (input.substring(0, 1).equals(",")) {
-                        if (input.contains(":")) {
-                            variable = input.substring(1, input.indexOf(":"));
-                            variable = transpile(variable);
-                            parameter = input.substring(input.indexOf(":") + 1);
+                    switch (input.substring(0, 1)) {
+                        case ".":
+                            parameter = input.substring(1);
                             parameter = transpile(parameter);
 
                             if (isConsole) {
-                                return "wscript.echo(" + parameter + ")\r\n" + variable + " = WScript.StdIn.ReadLine()";
+                                return "wscript.echo(" + parameter + ")";
                             }
 
-                            return variable + " = inputbox(" + parameter + ")";
-                        }
+                            return "msgbox(" + parameter + ")";
+                        case ",":
+                            if (input.contains(":")) {
+                                variable = input.substring(1, input.indexOf(":"));
+                                variable = transpile(variable);
+                                parameter = input.substring(input.indexOf(":") + 1);
+                                parameter = transpile(parameter);
 
-                        variable = input.substring(1);
-                        variable = transpile(variable);
+                                if (isConsole) {
+                                    return "wscript.echo(" + parameter + ")\r\n" + variable + " = WScript.StdIn.ReadLine()";
+                                }
 
-                        if (isConsole) {
-                            return variable + " = WScript.StdIn.ReadLine()";
-                        }
+                                return variable + " = inputbox(" + parameter + ")";
+                            }
 
-                        return variable + " = inputbox(\"\")";
-                    } else if (input.substring(0, 2).equals(":?")) {
-                        condition = input.substring(2, input.indexOf(":", 2));
-                        condition = transpile(condition);
-                        statement = input.substring(input.indexOf(":", 2) + 1);
-                        statement = transpile(statement);
-                        return "elseif " + condition + " then\r\n" + statement;
-                    } else if (input.substring(0, 1).equals("?")) {
-                        condition = input.substring(1, input.indexOf(":"));
-                        condition = transpile(condition);
-                        statement = input.substring(input.indexOf(":") + 1);
-                        statement = transpile(statement);
-                        return "if " + condition + " then\r\n" + statement;
-                    } else if (input.substring(0, 1).equals(":")) {
-                        statement = input.substring(1);
-                        statement = transpile(statement);
-                        return "else\r\n" + statement;
-                    } else if (input.substring(0, 1).equals("+")) {
-                        variable = input.substring(1);
-                        variable = transpile(variable);
-                        return variable + " = " + variable + " + 1";
-                    } else if (input.substring(0, 1).equals("-")) {
-                        variable = input.substring(1);
-                        variable = transpile(variable);
-                        return variable + " = " + variable + " - 1";
-                    } else if (input.substring(0, 1).equals(">")) {
-                        if (input.contains("{")) {
-                            parameter = input.substring(1, input.indexOf("{"));
-                            parameter = transpile(parameter);
-                            currentFunction = parameter.substring(0, parameter.indexOf("("));
-                            currentFunction = transpile(currentFunction);
-                            statement = input.substring(input.indexOf("{") + 1);
+                            variable = input.substring(1);
+                            variable = transpile(variable);
+
+                            if (isConsole) {
+                                return variable + " = WScript.StdIn.ReadLine()";
+                            }
+
+                            return variable + " = inputbox(\"\")";
+                        case "?":
+                            condition = input.substring(1, input.indexOf(":"));
+                            condition = transpile(condition);
+                            statement = input.substring(input.indexOf(":") + 1);
                             statement = transpile(statement);
-                            return "function " + parameter + "\r\n" + statement;
-                        }
-                        
-                        parameter = input.substring(1);
-                        parameter = transpile(parameter);
-                        return "dim " + parameter;
-                    } else if (input.substring(0, 1).equals("<")) {
-                        parameter = input.substring(1);
-                        parameter = transpile(parameter);
-                        return currentFunction + " = " + parameter + "\r\nexit function";
-                    } else if (input.substring(0, 1).equals("}")) {
-                        statement = input.substring(1);
-                        statement = transpile(statement);
-                        return "end function\r\n" + statement;
-                    } else if (input.substring(0, 1).equals("[")) {
-                        statement = input.substring(1);
-                        statement = transpile(statement);
-                        return "do\r\n" + statement;
-                    } else if (input.substring(0, 1).equals("]")) {
-                        statement = input.substring(1);
-                        statement = transpile(statement);
-                        return "loop\r\n" + statement;
-                    } else if (input.substring(0, 1).equals("#")) {
-                        variable = input.substring(1, input.indexOf(":"));
-                        variable = transpile(variable);
-                        parameter = input.substring(input.indexOf(":") + 1);
-                        parameter = transpile(parameter);
-                        return "set " + variable + " = CreateObject(" + parameter + ")";
-                    } else if (input.substring(0, 1).equals("=")) {
-                        if (input.contains(":")) {
+                            return "if " + condition + " then\r\n" + statement;
+                        case ":":
+                            statement = input.substring(1);
+                            statement = transpile(statement);
+                            return "else\r\n" + statement;
+                        case "+":
+                            variable = input.substring(1);
+                            variable = transpile(variable);
+                            return variable + " = " + variable + " + 1";
+                        case "-":
+                            variable = input.substring(1);
+                            variable = transpile(variable);
+                            return variable + " = " + variable + " - 1";
+                        case ">":
+                            if (input.contains("{")) {
+                                parameter = input.substring(1, input.indexOf("{"));
+                                parameter = transpile(parameter);
+                                currentFunction = parameter.substring(0, parameter.indexOf("("));
+                                currentFunction = transpile(currentFunction);
+                                statement = input.substring(input.indexOf("{") + 1);
+                                statement = transpile(statement);
+                                return "function " + parameter + "\r\n" + statement;
+                            }
+                            
+                            parameter = input.substring(1);
+                            parameter = transpile(parameter);
+                            return "dim " + parameter;
+                        case "<":
+                            parameter = input.substring(1);
+                            parameter = transpile(parameter);
+                            return currentFunction + " = " + parameter + "\r\nexit function";
+                        case "}":
+                            statement = input.substring(1);
+                            statement = transpile(statement);
+                            return "end function\r\n" + statement;
+                        case "[":
+                            statement = input.substring(1);
+                            statement = transpile(statement);
+                            return "do\r\n" + statement;
+                        case "]":
+                            statement = input.substring(1);
+                            statement = transpile(statement);
+                            return "loop\r\n" + statement;
+                        case "#":
                             variable = input.substring(1, input.indexOf(":"));
                             variable = transpile(variable);
                             parameter = input.substring(input.indexOf(":") + 1);
                             parameter = transpile(parameter);
-                            return variable + " = " + parameter;
-                        }
+                            return "set " + variable + " = CreateObject(" + parameter + ")";
+                        case "=":
+                            if (input.contains(":")) {
+                                variable = input.substring(1, input.indexOf(":"));
+                                variable = transpile(variable);
+                                parameter = input.substring(input.indexOf(":") + 1);
+                                parameter = transpile(parameter);
+                                return variable + " = " + parameter;
+                            }
 
-                        parameter = input.substring(1);
-                        parameter = transpile(parameter);
-                        return "eval(" + parameter + ")";
-                    } else if (input.contains("`")) {
+                            parameter = input.substring(1);
+                            parameter = transpile(parameter);
+                            return "eval(" + parameter + ")";
+                        case "!":
+                            parameter = input.substring(1);
+                            parameter = transpile(parameter);
+                            return "wscript.echo(" + parameter + ")\r\nwscript.quit";
+                    }
+
+                    if (input.contains("`")) {
                         return scan(input);
-                    } else if (input.equals("@c")) {
-                        isConsole = true;
-                        return "";
-                    } else if (input.equals("@e")) {
-                        return "option explicit";
-                    } else if (input.equals("@p")) {
-                        isPrinted = true;
-                        return "";
                     }
             }
         } catch (Exception e) {
@@ -260,104 +284,82 @@ public class Program {
             for (int i = 0; i < input.length(); i++) {
                 element = input.charAt(i);
 
-                switch (element) {
-                    case '\"':
-                        switch (currentState) {
-                            case "normal":
+                switch (currentState) {
+                    case "normal":
+                        switch (element) {
+                            case '\"':
                                 currentState = "string";
                                 scannedInput += "\"";
                                 break;
-                            case "string":
+                            case '`':
+                                currentState = "template";
+                                scannedInput += "\"";
+                                break;
+                            default:
+                                scannedInput += element;
+                        }
+
+                        break;
+                    case "string":
+                        switch (element) {
+                            case '"':
                                 currentState = "normal";
                                 scannedInput += "\"";
                                 break;
-                            case "template":
+                            default:
+                                scannedInput += element;
+                        }
+
+                        break;
+                    case "template":
+                        switch (element) {
+                            case '`':
+                                currentState = "normal";
+                                scannedInput += "\"";
+                                break;
+                            case '\"':
                                 scannedInput += "\"\"";
                                 break;
-                            default:
-                                scannedInput += "\"";
-                        }
-                        
-                        break;
-                    case '`':
-                        switch (currentState) {
-                            case "normal":
-                                currentState = "template";
-                                scannedInput += "\"";
+                            case '\\':
+                                currentState = "escape";
                                 break;
-                            case "template":
-                                currentState = "normal";
-                                scannedInput += "\"";
-                                break;
-                            case "escape":
-                                currentState = "template";
-                                scannedInput += "`";
+                            case '$':
+                                if (input.charAt(i + 1) == '{') {
+                                    currentState = "interpolate";
+                                } else {
+                                    scannedInput += "$";
+                                }
+                                
                                 break;
                             default:
-                                scannedInput += "`";
+                                scannedInput += element;
                         }
 
                         break;
-                    case '{':
-                        switch (currentState) {
-                            case "template":
+                    case "escape":
+                        switch (element) {
+                            case 'n':
+                                scannedInput += "\" & vbcrlf & \"";
+                                break;
+                            default:
+                                scannedInput += element;
+                        }
+
+                        currentState = "template";
+                        break;
+                    case "interpolate":
+                        switch (element) {
+                            case '{':
                                 scannedInput += "\" & ";
                                 break;
-                            case "escape":
+                            case '}':
                                 currentState = "template";
-                                scannedInput += "{";
-                                break;
-                            default:
-                                scannedInput += "{";
-                        }
-
-                        break;
-                    case '}':
-                        switch (currentState) {
-                            case "template":
                                 scannedInput += " & \"";
                                 break;
-                            case "escape":
-                                currentState = "template";
-                                scannedInput += "}";
-                                break;
                             default:
-                                scannedInput += "}";
-                        }
-
-                        break;
-                    case '\\':
-                        switch (currentState) {
-                            case "template":
-                                switch (input.charAt(i + 1)) {
-                                    case '`':
-                                        currentState = "escape";
-                                        break;
-                                    case '{':
-                                        currentState = "escape";
-                                        break;
-                                    case '}':
-                                        currentState = "escape";
-                                        break;
-                                    case '\\':
-                                        currentState = "escape";
-                                        break;
-                                    default:
-                                        scannedInput += "\\";
-                                }
-
+                                scannedInput += element;
                                 break;
-                            case "escape":
-                                currentState = "template";
-                                scannedInput += "\\";
-                                break;
-                            default:
-                                scannedInput += "\\";
                         }
-
-                        break;
-                    default:
-                        scannedInput += element;
                 }
             }
         } catch (Exception e) {
