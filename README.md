@@ -25,9 +25,11 @@ If no argument is given, it will display the list of arguments that can be used 
 
 `cd "c:\<projectDirectory>\" && javac Program.java && java Program "c:\fileDirectory\program.ivvbs"`
 
-## Documentation
+### Exporting the transpiled code.
 
-Due to the limitations of my smol brain, it's required that every statement terminators `;` must follow with a newline, otherwise it will not work.
+`cd "c:\<projectDirectory>\" && javac Program.java && java Program -i "c:\fileDirectory\program.ivvbs" -o "c:\fileDirectory\program.vbs"`
+
+## Documentation
 
 ### Print
 
@@ -279,6 +281,22 @@ x = "Hello, world!";
 .x;
 ```
 
+### Breakpoint
+
+Stop the execution and print the value of the expression.
+
+`!<expression>`
+
+`expression` A statement that returns a value to be printed.
+
+Example:
+
+```
+x = "Hello, world!";
+!x;
+'Stops the program and displays "Hello, world!";
+```
+
 ### Options
 
 `@e;` Option explicit. 	Forces all variables to be declared.
@@ -310,14 +328,18 @@ Easily use double quotes and interpolate variables and expressions into a string
 
 `expression` Variables or expressions to be interpolated into the string.
 
-To use the special template characters `` ` `` `{` `}` `\` as a string character, use the escape character `\` before them. If no special characters are next to `\`, then it will act as a string character.
+If there are characters included in the template literal that affects the template literal statement such as `` ` `` `\` `$`, you can add an escape character `\` before it to treat it as a character.
+
+The escape symbol `\n` inserts a newline within the template literal.
+
+It is required to escape the characters `;` `:` in strings and template literals when using it as a character.
 
 Example:
 
 ```
 var1 = "fox";
 var2 = "dog";
-.`The quick brown {var1} "jumps" over the lazy {var2}`;
+.`The quick brown ${var1} "jumps" over the lazy ${var2}`;
 ```
 
 ## Loop techniques
@@ -356,6 +378,17 @@ Repeat a block of statements a given number of times.
 ```
 
 ## Changelog
+
+### 2022-11-22 v1.3.0
+
+- Added an escape symbol `\n` to add a newline within a template literal.
+- Adding an expression next to the exit statement `!;` turns it into a breakpoint statement `!<expression>;` and allows it to stop the program and print the value of the expression.
+- It is now possible to use statement terminators `;` without having to pair it with a newline so it is now also possible to have multiple statements within a single line. However it is now required to escape semicolons `;` with the escape character `\` when using it in strings and template literals.
+- Interpolating variables into template literals now use `${}` instead of only `{}`. This is so it is no longer required to escape the characters `{` and `}` when using it in template literals.
+- It is now possible to run this program on older versions of Java where the method `.strip()` is not a thing yet.
+- A complete rearrangement of the code where switch cases are used instead of if else statements for the `transpile()` method, and switched the switch case layering between `currentState` and `element` in the `scan()` method to make the code easier to read. However because of this, it is now required to escape the escape character `\\` when using it in template literals.
+- Fixed a bug regarding colons where using colons within a string in a syntax where colons are optional are treated as part of the syntax. However it is now required to escape colons `:` with the escape character `\` when using it in strings and template literals.
+- Fixed a bug where statements with only 2 characters are treated as constant methods that only require 2 characters and are not parsed.
 
 ### 2022-11-13 v1.2.0
 
