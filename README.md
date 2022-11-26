@@ -11,7 +11,7 @@ A custom language to VBScript transpiler written in a crappy language full of bo
 
 `-i <filePath>` Sets the path of the source code to be transpiled.
 
-`-o <filePath>` Sets the path where the transpiled code will be written to. If not declared, the program will run directly from its source code.
+`-o <filePath>` Sets the path where the transpiled code will be written to. If not declared, the program will run directly from the source code.
 
 `-p` Prints the entire transpiled code to the terminal.
 
