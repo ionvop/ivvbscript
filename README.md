@@ -1,5 +1,5 @@
 # ivvbscript
-A VBScript transpiler written in a crappy language full of boilerplates and unnecessarily long syntaxes called Java for a crappy custom language full of unintuitive and unnecessarily short syntaxes that I made.
+A custom language to VBScript transpiler written in a crappy language full of boilerplates and unnecessarily long syntaxes called Java for a crappy custom language full of unintuitive and unnecessarily short syntaxes that I made.
 
 ## Usage
 
