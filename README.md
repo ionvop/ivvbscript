@@ -350,8 +350,7 @@ Conditionally repeat a block of statements.
 
 ```
 [
-    ? <condition>:
-    :;
+    ? <condition>:;:
         /;
     ?;
     
