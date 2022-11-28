@@ -112,7 +112,6 @@ public class Program {
         String variable;
         String condition;
         String statement;
-        input = input.strip();
 
         try {
             input = input.strip();
