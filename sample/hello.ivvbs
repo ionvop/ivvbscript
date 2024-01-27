@@ -1,0 +1,3 @@
+> name;
+,name: "Enter name: ";
+.`Hello, ${name}!`;

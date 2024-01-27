@@ -1,0 +1,103 @@
+> Main()
+    > historyRaw, history, input, apiKey, headers, data, res;
+
+    historyRaw = `
+        {
+            "role": "system",
+            "content": "You are a helpful assistant"
+        }
+    `;
+
+    apiKey = $expandenvironmentstrings("%OPENAI_API_KEY%");
+    headers = `Content-Type: application/json\nAuthorization: Bearer ${apiKey}`;
+    headers = split(headers, vbcrlf);
+
+    [
+        ,input: "USER: ";
+
+        &historyRaw: `,
+            {
+                "role": "user",
+                "content": "${input}"
+            }
+        `;
+
+        history = `[${historyRaw}]`;
+
+        data = `
+            {
+                "model": "gpt-3.5-turbo",
+                "messages": ${history}
+            }
+        `;
+
+        res = SendCurl("https://api.openai.com/v1/chat/completions", "POST", headers, data);
+        res = MidString(res, `content": "`, `},`);
+        res = left(res, instrrev(res, """") - 1);
+        res = Parse(res);
+        .`ASSISTANT: ${res}`;
+
+        &historyRaw: `,
+            {
+                "role": "assistant",
+                "content": "${res}"
+            }
+        `;
+    ]
+< 0;
+
+> SendCurl(url, method, headers, data)
+    > i, key, value;
+    %open method, url, false;
+    i = 0;
+
+    [
+        ? i > ubound(headers):
+            \
+        ?;
+
+        key = left(headers(i), instr(headers(i), ":") - 1);
+        value = mid(headers(i), instr(headers(i), ":") + 1);
+        key = trim(key);
+        value = trim(value);
+        %setrequestheader key, value;
+        +i;
+    ]
+
+    %send(data);
+< %responsetext;
+
+> MidString(input, leftString, rightString)
+    input = mid(input, instr(input, leftString) + len(leftString));
+    input = left(input, instr(input, rightString) - 1);
+< input;
+
+> Parse(input)
+    > i, result;
+    i = 1;
+    result = "";
+
+    [
+        ? i > len(input):
+            \
+        ?;
+
+        ? mid(input, i, 1) = "\":
+            +i;
+
+            ? mid(input, i, 1) = "n":
+                &result: vbcrlf;
+            :? mid(input, i, 1) = "t":
+                &result: vbtab;
+            :
+                &result: mid(input, i, 1);
+            ?;
+        :
+            &result: mid(input, i, 1);
+        ?;
+
+        +i;
+    ]
+< result;
+
+Main();
