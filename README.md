@@ -253,6 +253,8 @@ var2 = "dog";
 
 Commonly used ActiveX objects and miscellaneous functions in VBScript projects can now be accessed using a special character.
 
+`^` argument
+
 `$` WScript.Shell
 
 `$^(<env>)` environment variables
@@ -270,6 +272,7 @@ Example:
 content = #opentextfile("test.txt").readall();
 .content;
 
+.^1;
 .$^("%ENV%");
 
 $run("mspaint");
