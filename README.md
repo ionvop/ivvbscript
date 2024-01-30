@@ -1,70 +1,24 @@
 # ivvbscript
-A custom language to VBScript transpiler written in a crappy language full of boilerplates and unnecessarily long syntaxes called Java for a crappy custom language full of unintuitive and unnecessarily short syntaxes that I made.
+A custom language to VBScript transpiler written in VBScript that focuses on hacky syntax at the cost of readability and intuitiveness.
 
 ## Usage
 
-### Command-line
-
-`cd "c:\<projectDirectory>\" && javac Program.java && java Program`
-
-### Arguments
-
-`-i <filePath>` Sets the path of the source code to be transpiled.
-
-`-o <filePath>` Sets the path where the transpiled code will be written to. If not declared, the program will run directly from the source code.
-
-`-p` Prints the entire transpiled code to the terminal.
-
-`-c` Transpiles the source code as cscript for console.
-
-If only one argument is given, it will be treated as the path of the source code to be transpiled.
-
-If no argument is given, it will display the list of arguments that can be used in this program.
-
-### Running the source code
-
-`cd "c:\<projectDirectory>\" && javac Program.java && java Program "c:\fileDirectory\program.ivvbs"`
-
-### Exporting the transpiled code.
-
-`cd "c:\<projectDirectory>\" && javac Program.java && java Program -i "c:\fileDirectory\program.ivvbs" -o "c:\fileDirectory\program.vbs"`
+`ivvbs "path\to\file.ivvbs"`
 
 ## Documentation
 
-### Print
+### Variable declaration
 
-Display a dialogue box message.
+Declare a new variable or array variable within a scope.
 
-`.<message>;`
+`> <variables>`
 
-`message` Message to be displayed.
-
-Example:
-
-```
-."Hello, world!";
-
-.7 + 4;
-'Displays 11;
-```
-
-### Input
-
-Prompt for user input.
-
-`,<variable>;`
-
-`,<variable> : <prompt>;`
-
-`variable` The variable to be assigned.
-
-`prompt` The dialogue box prompt text.
+`variables` The variables to be declared.
 
 Example:
 
 ```
-,input : "Enter your message";
-.input;
+> var1, var2;
 ```
 
 ### Comment
@@ -78,8 +32,44 @@ Add a comment.
 Example:
 
 ```
-,input : "Enter your message";
 'This is a comment;
+```
+
+### Print
+
+Display a dialogue box message.
+
+`.<value>;`
+
+`message` Message to be displayed.
+
+Example:
+
+```
+."Hello, world!";
+'Outputs Hello, world!;
+
+.7 + 4;
+'Outputs 11;
+```
+
+### Input
+
+Prompt for user input.
+
+`,<variable>;`
+
+`,<variable> : <prompt>;`
+
+`variable` The variable to be assigned.
+
+`prompt` The prompt text.
+
+Example:
+
+```
+> input;
+,input: "Enter your message";
 .input;
 ```
 
@@ -90,10 +80,10 @@ Conditionally execute a block of statements.
 ```
 ? <condition>:
     <statements>
-:? <condition>:
-    <statements>
+:? <elseif_condition>:
+    <elseif_statements>
 :
-    <statements>
+    <else_statements>
 ?;
 ```
 
@@ -104,7 +94,8 @@ Conditionally execute a block of statements.
 Example:
 
 ```
-,input : "What's 9 + 10?";
+> input;
+,input: "What's 9 + 10?";
 
 ? input = 21:
     ."You stupid";
@@ -115,36 +106,14 @@ Example:
 ?;
 ```
 
-### Dim
-
-Declare a new variable or array variable within a scope.
-
-`> <variables>`
-
-`variables` The variables to be declared.
-
-Example:
-
-```
-> var1, var2;
-var1 = 7;
-var2 = 4;
-
-> add() {
-    > var3;
-    var3 = var1 + var2;
-}
-```
-
 ### Function
 
 Define a function procedure.
 
 ```
-> <name>(<parameters>) {
+> <name>(<parameters>)
     <statements>
-    < <expression>;
-}
+< <value>;
 ```
 
 `name` The name of the function.
@@ -153,41 +122,57 @@ Define a function procedure.
 
 `statements` Program code.
 
-`expression` The value to return.
+`value` The value to return.
 
 Example:
 
 ```
-> add(val1, val2) {
-    < val1 + val2;
-}
+> add(num1, num2)
+    > result;
+    result = num1 + num2;
+< result;
 
 .add(4, 7);
-'Displays 11;
+'Outputs 11;
 ```
 
-### Increment/Decrement
+### Operators
 
-Increases/decreases the value of a variable by 1.
+Adds/subtracts/multiplies/divides/concatenates the value of a variable by a given value.
 
-`+<variable>;`
+`+<variable>: <value>;`
 
-`-<variable>;`
+`-<variable>: <value>;`
+
+`*<variable>: <value>;`
+
+`/<variable>: <value>;`
+
+`&<variable>: <value>;`
 
 `variable` The variable to be incremented/decremented.
 
+If a value is not given, the variable is added/subtracted by 1, multiplied/divided by 2, or concatenated with a newline by default.
+
 Example:
 
 ```
-x = 5;
-+x;
-.x;
-'Displays 6;
+> num;
+num = 7;
 
-y = 5;
--y;
-.y;
-'Displays 4;
++num: 4; 'num is now 11;
+-num: 3; 'num is now 8;
+*num: 4: 'num is now 32;
+/num: 8; 'num is now 4;
+&num: "hello"; 'num is now "4hello";
+
+num = 4;
+
++num; 'num is now 5;
+-num; 'num is now 4;
+*num; 'num is now 8;
+/num; 'num is now 4;
+&num; 'num is now "4\n";
 ```
 
 ### Loop
@@ -197,125 +182,27 @@ Repeat a block of statements.
 ```
 [
     <statements>
-    /;
+    /
 ]
 ```
 
-`statements` Program code to be repeated until `/;` is called.
-
-### Object
-
-Assign an object reference.
-
-`# <variable> : <object>;`
-
-`variable` The variable to be assigned.
-
-`object` The name of the Windows Scripting Host (WSH) automation object.
-
-Example:
-
-```
-# objShell : "wscript.shell";
-objShell.Run("notepad.exe");
-```
-
-### Eval
-
-Evaluate an expression.
-
-`= <expression>;`
-
-`expression` A string expression that returns a value.
-
-Example:
-
-```
-x = "7 + 4";
-.=x;
-'Displays 11;
-```
-
-### Assign
-
-Assign a value to a variable.
-
-`= <variable> : <value>;`
-
-`variable` The variable to be assigned.
-
-`value` The value that is assigned to the variable.
-
-Example:
-
-```
-= x : "Hello, world!";
-.x;
-'Displays "Hello, world!";
-```
-
-This is usually used with the eval statement.
-
-```
-var1 = 7;
-var2 = 4;
-var3 = "var1 + var2";
-= result : = var3;
-.result;
-'Displays 11;
-```
+`statements` Program code to be repeated until `/` is called.
 
 ### Exit
 
-Stop the execution.
+Stop the execution and print a message.
 
-`!;`
+`!<message>`
 
-Example:
-
-```
-x = "Hello, world!";
-!;
-
-'Unreachable code;
-.x;
-```
-
-### Breakpoint
-
-Stop the execution and print the value of the expression.
-
-`!<expression>`
-
-`expression` A statement that returns a value to be printed.
+`message` Message to be displayed.
 
 Example:
 
 ```
+> x;
 x = "Hello, world!";
 !x;
-'Stops the program and displays "Hello, world!";
-```
-
-### Options
-
-`@e;` Option explicit. 	Forces all variables to be declared.
-
-`@c;` Transpiles the source code as cscript for terminal.
-
-`@p;` Prints the entire transpiled code to the terminal.
-
-```
-@e;
-x = 1;
-.x;
-'Displays an error because x has not been declared yet before using;
-
-@e;
-> x;
-x = 1;
-.x;
-'Displays 1;
+'Stops the program and outputs "Hello, world!";
 ```
 
 ### Template literal
@@ -332,14 +219,33 @@ If there are characters included in the template literal that affects the templa
 
 The escape symbol `\n` inserts a newline within the template literal.
 
-It is required to escape the characters `;` `:` in strings and template literals when using it as a character.
+Example:
+
+```
+> var1, var2;
+var1 = "fox";
+var2 = "dog";
+.`The quick brown ${var1} "jumps" over the lazy ${var2}`;
+```
+
+### Special objects
+
+Commonly used ActiveX objects in VBScript projects can now be accessed using a special character.
+
+`$` WScript.Shell
+
+`#` Scripting.FileSystemObject
+
+`%` MSXML2.XMLHTTP.6.0
 
 Example:
 
 ```
-var1 = "fox";
-var2 = "dog";
-.`The quick brown ${var1} "jumps" over the lazy ${var2}`;
+> content;
+content = #opentextfile("test.txt").readall();
+.content;
+
+$run("mspaint");
 ```
 
 ## Loop techniques
@@ -350,8 +256,8 @@ Conditionally repeat a block of statements.
 
 ```
 [
-    ? <condition>:;:
-        /;
+    ? <condition>::
+        /
     ?;
     
     <statements>
@@ -363,20 +269,27 @@ Conditionally repeat a block of statements.
 Repeat a block of statements a given number of times.
 
 ```
-<counter> = initialValue - 1;
+> <counter>;
+<counter> = initialValue;
 
 [
-    +<counter>;
-    
-    ? <counter> > <maxValue>:
+    ? <condition>::
         /;
     ?;
     
-    <statement>
+    <statements>
+    +<counter>;
 ]
 ```
 
 ## Changelog
+
+### 2024-01-28 v2.0.0
+
+- A complete rewrite of the source code from scratch.
+- Rewritten in VBScript because it funny and improved maintainability of the code.
+- It is no longer required to escape semicolons `;` within strings and template literals.
+- Scripts can be executed using the `ivvbs` command.
 
 ### 2022-11-22 v1.3.0
 
