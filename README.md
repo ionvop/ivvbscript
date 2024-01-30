@@ -11,7 +11,7 @@ A custom language to VBScript transpiler written in VBScript that focuses on hac
 
 Declare a new variable or array variable within a scope.
 
-`> <variables>`
+`> <variables>;`
 
 `variables` The variables to be declared.
 
