@@ -21,8 +21,9 @@ sub Main()
     result = result & "dim ivvbselement" & vbcrlf
     result = result & "if typename(ivvbsmessage) = ""Variant()"" then" & vbcrlf
     result = result & "for each ivvbselement in ivvbsmessage" & vbcrlf
-    result = result & "wscript.echo(ivvbselement)" & vbcrlf
+    result = result & "wscript.stdout.write(ivvbselement & "", "")" & vbcrlf
     result = result & "next" & vbcrlf
+    result = result & "wscript.echo("""")" & vbcrlf
     result = result & "exit sub" & vbcrlf
     result = result & "end if" & vbcrlf
     result = result & "wscript.echo(ivvbsmessage)" & vbcrlf
@@ -59,6 +60,10 @@ sub Main()
                     statement = statement & "ivvbsobjfile."
                     i = i + 1
                     element = mid(content, i, 1)
+                case "@"
+                    statement = statement & "set "
+                    i = i + 1
+                    element = mid(content, i, 1)
                 case "%"
                     if mid(content, i + 1, 1) = "%" then
                         statement = statement & "ivvbsobjhttp."
@@ -82,6 +87,12 @@ sub Main()
                 case "|"
                     if mid(content, i + 1, 1) = "|" then
                         statement = statement & " or "
+                        i = i + 2
+                        element = mid(content, i, 1)
+                    end if
+                case "{"
+                    if mid(content, i + 1, 1) = "}" then
+                        statement = statement & "createobject(""scripting.dictionary"")"
                         i = i + 2
                         element = mid(content, i, 1)
                     end if
@@ -158,9 +169,24 @@ sub Main()
                         end select
                     case "print"
                         select case element
+                            case "."
+                                if statement = "" then
+                                    token = "print2"
+                                else
+                                    statement = statement & element
+                                end if
                             case ";"
                                 token = "start"
                                 result = result & "ivvbsprint(" & statement & ")" & vbcrlf
+                                statement = ""
+                            case else
+                                statement = statement & element
+                        end select
+                    case "print2"
+                        select case element
+                            case ";"
+                                token = "start"
+                                result = result & "wscript.stdout.write(" & statement & ")" & vbcrlf
                                 statement = ""
                             case else
                                 statement = statement & element
