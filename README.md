@@ -188,6 +188,27 @@ Repeat a block of statements.
 
 `statements` Program code to be repeated until `/` is called.
 
+### Resize array
+
+Resize the size of an array while preserving its elements.
+
+`>> <array_name>(<new_size>)`
+
+`array_name` Name of the array to be resized
+
+`new_size` The new size of the array
+
+Example:
+
+```
+> arr;
+arr = array("apple", "orange");
+.arr; 'Outputs "apple, orange,";
+>> arr(2);
+arr(2) = "banana";
+.arr; 'Outputs "apple, orange, banana,";
+```
+
 ### Exit
 
 Stop the execution and print a message.
