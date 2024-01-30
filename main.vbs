@@ -46,21 +46,45 @@ sub Main()
                     i = i + 1
                     element = mid(content, i, 1)
                 case "$"
-                    statement = statement & "ivvbsobjshell."
-                    i = i + 1
-                    element = mid(content, i, 1)
+                    if mid(content, i + 1, 1) = "^" then
+                        statement = statement & "ivvbsobjshell.expandenvironmentstrings"
+                        i = i + 2
+                        element = mid(content, i, 1)
+                    else
+                        statement = statement & "ivvbsobjshell."
+                        i = i + 1
+                        element = mid(content, i, 1)
+                    end if
                 case "#"
                     statement = statement & "ivvbsobjfile."
                     i = i + 1
                     element = mid(content, i, 1)
                 case "%"
-                    statement = statement & "ivvbsobjhttp."
-                    i = i + 1
-                    element = mid(content, i, 1)
+                    if mid(content, i + 1, 1) = "%" then
+                        statement = statement & "ivvbsobjhttp."
+                        i = i + 2
+                        element = mid(content, i, 1)
+                    else
+                        statement = statement & " mod "
+                        i = i + 1
+                        element = mid(content, i, 1)
+                    end if
                 case "^"
                     statement = statement & "wscript.arguments(" & mid(content, i + 1, 1) & ")"
                     i = i + 2
                     element = mid(content, i, 1)
+                case "&"
+                    if mid(content, i + 1, 1) = "&" then
+                        statement = statement & " and "
+                        i = i + 2
+                        element = mid(content, i, 1)
+                    end if
+                case "|"
+                    if mid(content, i + 1, 1) = "|" then
+                        statement = statement & " or "
+                        i = i + 2
+                        element = mid(content, i, 1)
+                    end if
             end select
         end if
         
