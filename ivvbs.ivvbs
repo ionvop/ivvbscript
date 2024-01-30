@@ -179,86 +179,80 @@ end sub\n
                     :
                         &statement: element;
             :? token = "dim":
-                select case element
-                    case ">"
-                        if statement = "" then
-                            token = "redim"
-                            statement = ""
-                        else
-                            &statement: element
-                        end if
-                    case "("
-                        token = "function"
-                        temp = statement
-                        statement = ""
-                    case ";"
-                        token = "start"
-                        &result: "dim " & statement & vbcrlf
-                        statement = ""
-                    case else
-                        &statement: element
-                end select
+                ? element = ">":
+                    ? statement = "":
+                        token = "redim";
+                        statement = "";
+                    :
+                        &statement: element;
+                    ?;
+                :? element = "(":
+                    token = "function";
+                    temp = statement;
+                    statement = "";
+                :? element = ";":
+                    token = "start";
+                    &result: `dim ${statement}\n`;
+                    statement = "";
+                :
+                    &statement: element;
+                ?;
             :? token = "redim":
-                select case element
-                    case ";"
-                        token = "start"
-                        &result: "redim preserve " & statement & vbcrlf
-                        statement = ""
-                    case else
-                        &statement: element
-                end select
+                ? element = ";":
+                    token = "start";
+                    &result: `redim preserve ${statement}\n`;
+                    statement = "";
+                :
+                    &statement: element;
+                ?;
             :? token = "function":
-                select case element
-                    case ")"
-                        token = "start"
-                        &result: "function " & temp & "(" & statement & ")" & vbcrlf
-                        funcScope = temp
-                        statement = ""
-                    case else
-                        &statement: element
-                end select
+                ? element = ")":
+                    token = "start";
+                    &result: `function ${temp}(${statement})\n`;
+                    funcScope = temp;
+                    statement = "";
+                :
+                    &statement: element;
+                ?;
             :? token = "return":
-                select case element
-                    case ";"
-                        token = "start"
-                        &result: funcScope & " = " & statement & vbcrlf
-                        &result: "end function" & vbcrlf
-                        funcScope = ""
-                        statement = ""
-                    case else
-                        &statement: element
-                end select
+                ? element = ";":
+                    token = "start";
+                    &result: `${funcScope} = ${statement}\n`;
+                    &result: `end function\n`;
+                    funcScope = "";
+                    statement = "";
+                :
+                    &statement: element;
+                ?;
             :? token = "operate":
-                select case element
-                    case ":"
-                        token = "operate2"
-                        temp2 = statement
-                        statement = ""
-                    case ";"
-                        token = "start"
-                        
-                        select case temp
-                            case "+", "-"
-                                &result: statement & " = " & statement & " " & temp & " 1" & vbcrlf
-                            case "*", "/"
-                                &result: statement & " = " & statement & " " & temp & " 2" & vbcrlf
-                            case "&"
-                                &result: statement & " = " & statement & " " & temp & " vbcrlf" & vbcrlf
-                        end select
+                ? element = ":":
+                    token = "operate2";
+                    temp2 = statement;
+                    statement = "";
+                :? element = ";":
+                    token = "start";
+                    
 
-                        statement = ""
-                    case else
-                        &statement: element
-                end select
+                    ? temp = "+" or temp = "-":
+                        &result: `${statement} = ${statement} ${temp} 1\n`;
+                    :? temp = "*" or temp = "/":
+                        &result: `${statement} = ${statement} ${temp} 2\n`;
+                    case "&"
+                        &result: `${statement} = ${statement} & vbcrlf\n`;
+                    ?;
+
+                    statement = "";
+                :
+                    &statement: element;
+                ?;
             :? token = "operate2":
-                select case element
-                    case ";"
-                        token = "start"
-                        &result: temp2 & " = " & temp2 & " " & temp & " " & statement & vbcrlf
-                        statement = ""
-                    case else
-                        &statement: element
-                end select
+                    ? element = ";":
+                        token = "start";
+                        &result: `${temp2} = ${temp2} ${temp} ${statement}\n`;
+                        statement = "";
+                    :
+                        &statement: element;
+                    ?;
             :? token = "exit":
                 select case element
                     case ";"
