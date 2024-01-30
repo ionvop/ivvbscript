@@ -251,13 +251,17 @@ var2 = "dog";
 
 ### Special objects
 
-Commonly used ActiveX objects in VBScript projects can now be accessed using a special character.
+Commonly used ActiveX objects and miscellaneous functions in VBScript projects can now be accessed using a special character.
 
 `$` WScript.Shell
 
+`$^(<env>)` environment variables
+
 `#` Scripting.FileSystemObject
 
-`%` MSXML2.XMLHTTP.6.0
+`%` modulo operator
+
+`%%` MSXML2.XMLHTTP.6.0
 
 Example:
 
@@ -265,6 +269,8 @@ Example:
 > content;
 content = #opentextfile("test.txt").readall();
 .content;
+
+.$^("%ENV%");
 
 $run("mspaint");
 ```
