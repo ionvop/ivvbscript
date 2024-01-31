@@ -11,23 +11,7 @@ sub Main()
     content = replace(content, vbcrlf, "")
     scope = "code"
     token = "start"
-    result = "option explicit" & vbcrlf
-    result = result & "dim ivvbsobjshell, ivvbsobjfile, ivvbsobjhttp" & vbcrlf
-    result = result & "set ivvbsobjshell = createobject(""wscript.shell"")" & vbcrlf
-    result = result & "set ivvbsobjfile = createobject(""scripting.filesystemobject"")" & vbcrlf
-    result = result & "set ivvbsobjhttp = createobject(""msxml2.xmlhttp.6.0"")" & vbcrlf
-    result = result & "ivvbsobjshell.currentdirectory = ivvbsobjfile.getparentfolderName(ivvbsobjfile.getabsolutepathname(wscript.arguments(0)))" & vbcrlf
-    result = result & "sub ivvbsprint(ivvbsmessage)" & vbcrlf
-    result = result & "dim ivvbselement" & vbcrlf
-    result = result & "if typename(ivvbsmessage) = ""Variant()"" then" & vbcrlf
-    result = result & "for each ivvbselement in ivvbsmessage" & vbcrlf
-    result = result & "wscript.stdout.write(ivvbselement & "", "")" & vbcrlf
-    result = result & "next" & vbcrlf
-    result = result & "wscript.echo("""")" & vbcrlf
-    result = result & "exit sub" & vbcrlf
-    result = result & "end if" & vbcrlf
-    result = result & "wscript.echo(ivvbsmessage)" & vbcrlf
-    result = result & "end sub" & vbcrlf
+    result = objFile.OpenTextFile(directory & "\initial.vbs").ReadAll()
     statement = ""
     funcScope = ""
     
@@ -60,10 +44,6 @@ sub Main()
                     statement = statement & "ivvbsobjfile."
                     i = i + 1
                     element = mid(content, i, 1)
-                case "@"
-                    statement = statement & "set "
-                    i = i + 1
-                    element = mid(content, i, 1)
                 case "%"
                     if mid(content, i + 1, 1) = "%" then
                         statement = statement & "ivvbsobjhttp."
@@ -93,6 +73,12 @@ sub Main()
                 case "{"
                     if mid(content, i + 1, 1) = "}" then
                         statement = statement & "createobject(""scripting.dictionary"")"
+                        i = i + 2
+                        element = mid(content, i, 1)
+                    end if
+                case "["
+                    if mid(content, i + 1, 1) = "]" then
+                        statement = statement & "array"
                         i = i + 2
                         element = mid(content, i, 1)
                     end if
@@ -154,6 +140,12 @@ sub Main()
                             case "~"
                                 token = "sleep"
                                 statement = ""
+                            case "@"
+                                token = "normal"
+                                statement = "set "
+                            case "_"
+                                token = "normal"
+                                statement = "call "
                             case else
                                 token = "normal"
                                 statement = statement & element

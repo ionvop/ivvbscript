@@ -8,7 +8,7 @@
         }
     `;
 
-    apiKey = $expandenvironmentstrings("%OPENAI_API_KEY%");
+    apiKey = $^("%OPENAI_API_KEY%");
     headers = `Content-Type: application/json\nAuthorization: Bearer ${apiKey}`;
     headers = split(headers, vbcrlf);
 
@@ -48,7 +48,7 @@
 
 > SendCurl(url, method, headers, data)
     > i, key, value;
-    %open method, url, false;
+    %%open method, url, false;
     i = 0;
 
     [
@@ -60,12 +60,12 @@
         value = mid(headers(i), instr(headers(i), ":") + 1);
         key = trim(key);
         value = trim(value);
-        %setrequestheader key, value;
+        %%setrequestheader key, value;
         +i;
     ]
 
-    %send(data);
-< %responsetext;
+    %%send(data);
+< %%responsetext;
 
 > MidString(input, leftString, rightString)
     input = mid(input, instr(input, leftString) + len(leftString));
