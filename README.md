@@ -1,5 +1,5 @@
 # ivvbscript (IonVop VBScript)
-A custom language to VBScript transpiler written in VBScript that focuses on hacky syntax at the cost of readability and intuitiveness.
+A VBScript transpiler written in VBScript for a programming language I made that focuses on hacky syntax at the cost of readability and intuitiveness.
 
 ## Usage
 
