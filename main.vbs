@@ -6,7 +6,7 @@ dim directory
 directory = objFile.GetParentFolderName(wscript.ScriptFullName)
 
 sub Main()
-    dim i, element, content, scope, token, result, temp, temp2, statement, funcScope, interpolate
+    dim i, element, content, scope, token, result, temp, temp2, statement, funcScope, interpolate, keyword
     content = objFile.OpenTextFile(wscript.Arguments(0)).ReadAll()
     content = replace(content, vbcrlf, "")
     scope = "code"
@@ -55,8 +55,14 @@ sub Main()
                         element = mid(content, i, 1)
                     end if
                 case "^"
-                    statement = statement & "wscript.arguments(" & mid(content, i + 1, 1) & ")"
-                    i = i + 2
+                    if instr("0123456789", mid(content, i + 1, 1)) <> 0 and instr("0123456789", mid(content, i + 2, 1)) <> 0 then
+                        statement = statement & "wscript.arguments(" & mid(content, i + 1, 2) & ")"
+                        i = i + 3
+                    else
+                        statement = statement & "wscript.arguments(" & mid(content, i + 1, 1) & ")"
+                        i = i + 2
+                    end if
+
                     element = mid(content, i, 1)
                 case "&"
                     if mid(content, i + 1, 1) = "&" then
@@ -70,12 +76,6 @@ sub Main()
                         i = i + 2
                         element = mid(content, i, 1)
                     end if
-                case "{"
-                    if mid(content, i + 1, 1) = "}" then
-                        statement = statement & "createobject(""scripting.dictionary"")"
-                        i = i + 2
-                        element = mid(content, i, 1)
-                    end if
                 case "["
                     if mid(content, i + 1, 1) = "]" then
                         statement = statement & "array"
@@ -83,6 +83,83 @@ sub Main()
                         element = mid(content, i, 1)
                     end if
             end select
+        end if
+
+        if scope = "code" then
+            if element = "{" then
+                keyword = mid(content, i + 1)
+                i = i + instr(keyword, "}") + 1
+                keyword = left(keyword, instr(keyword, "}") - 1)
+
+                select case keyword
+                    case "r"
+                        statement = statement & "run"
+                    case "e"
+                        statement = statement & "exec"
+                    case "sk"
+                        statement = statement & "sendkeys"
+                    case "bp"
+                        statement = statement & "buildpath"
+                    case "cf"
+                        statement = statement & "copyfile"
+                    case "cfd"
+                        statement = statement & "copyfolder"
+                    case "crfd"
+                        statement = statement & "createfolder"
+                    case "ctf"
+                        statement = statement & "createtextfile"
+                    case "df"
+                        statement = statement & "deletefile"
+                    case "dfd"
+                        statement = statement & "deletefolder"
+                    case "de"
+                        statement = statement & "driveexists"
+                    case "fe"
+                        statement = statement & "fileexists"
+                    case "fde"
+                        statement = statement & "folderexists"
+                    case "gapn"
+                        statement = statement & "getabsolutepathname"
+                    case "gbn"
+                        statement = statement & "getbasename"
+                    case "gd"
+                        statement = statement & "getdrive"
+                    case "gdn"
+                        statement = statement & "getdrivename"
+                    case "gen"
+                        statement = statement & "getextensionname"
+                    case "gf"
+                        statement = statement & "getfile"
+                    case "gfn"
+                        statement = statement & "getfilename"
+                    case "gfd"
+                        statement = statement & "getfolder"
+                    case "gpfn"
+                        statement = statement & "getparentfoldername"
+                    case "gsfn"
+                        statement = statement & "getspecialfoldername"
+                    case "gss"
+                        statement = statement & "getstandardstream"
+                    case "gtn"
+                        statement = statement & "gettempname"
+                    case "mf"
+                        statement = statement & "movefile"
+                    case "mfd"
+                        statement = statement & "movefolder"
+                    case "otf"
+                        statement = statement & "opentextfile"
+                    case "ra"
+                        statement = statement & "readall"
+                    case "rl"
+                        statement = statement & "readline"
+                    case "aeos"
+                        statement = statement & "atendofstream"
+                    case "c"
+                        statement = statement & "close"
+                end select
+
+                element = mid(content, i, 1)
+            end if
         end if
         
         select case scope
@@ -140,9 +217,6 @@ sub Main()
                             case "~"
                                 token = "sleep"
                                 statement = ""
-                            case "@"
-                                token = "normal"
-                                statement = "set "
                             case "_"
                                 token = "normal"
                                 statement = "call "
