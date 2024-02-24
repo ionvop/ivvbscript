@@ -7,7 +7,7 @@ ivvbsobjshell.currentdirectory = ivvbsobjfile.getparentfolderName(ivvbsobjfile.g
 sub ivvbsprint(ivvbsmessage)
 dim ivvbselement
 if typename(ivvbsmessage) = "Variant()" then
-wscript.stdout.write(ivvbselement & "[")
+wscript.stdout.write("[")
 for each ivvbselement in ivvbsmessage
 if typename(ivvbselement) = "Variant()" then
 ivvbsprint(ivvbselement)
