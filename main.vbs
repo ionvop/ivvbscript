@@ -326,6 +326,7 @@ sub Main()
                             case ";"
                                 token = "start"
                                 result = result & "wscript.sleep(" & statement & ")" & vbcrlf
+                                statement = ""
                             case else
                                 statement = statement & element
                         end select
