@@ -1,0 +1,1 @@
+>MS(inp,l,r)inp={m}(inp,{is}(inp,l)+{le}(l));inp={l}(inp,{is}(inp,r)-1);<inp;
