@@ -1,0 +1,103 @@
+> M()
+    > hr, h, inp, ak, hd, d, r;
+
+    hr = `
+        {
+            "role": "system",
+            "content": "You are a helpful assistant"
+        }
+    `;
+
+    ak = $^("%OPENAI_API_KEY%");
+    hd = `Content-Type: application/json\nAuthorization: Bearer ${ak}`;
+    hd = {s}(hd, vbcrlf);
+
+    [
+        ,inp: "USER: ";
+
+        &hr: `,
+            {
+                "role": "user",
+                "content": "${inp}"
+            }
+        `;
+
+        h = `[${hr}]`;
+
+        d = `
+            {
+                "model": "gpt-3.5-turbo",
+                "messages": ${h}
+            }
+        `;
+
+        r = SC("https://api.openai.com/v1/chat/completions", "POST", hd, d);
+        r = MS(r, `content": "`, `},`);
+        r = {l}(r, {isr}(r, """") - 1);
+        r = P(r);
+        .`ASSISTANT: ${r}`;
+
+        &hr: `,
+            {
+                "role": "assistant",
+                "content": "${r}"
+            }
+        `;
+    ]
+< 0;
+
+> SC(u, m, h, d)
+    > i, k, v;
+    _%%{o}(m, u, {-});
+    i = 0;
+
+    [
+        ? i > {ub}(h):
+            \
+        ?;
+
+        k = {l}(h(i), {is}(h(i), ":") - 1);
+        v = {m}(h(i), {is}(h(i), ":") + 1);
+        k = {t}(k);
+        v = {t}(v);
+        _%%{srh}(k, v);
+        +i;
+    ]
+
+    %%{s}(d);
+< %%{rt};
+
+> MS(inp, l, r)
+    inp = {m}(inp, {is}(inp, l) + {le}(l));
+    inp = {l}(inp, {is}(inp, r) - 1);
+< inp;
+
+> P(inp)
+    > i, r;
+    i = 1;
+    r = "";
+
+    [
+        ? i > {le}(inp):
+            \
+        ?;
+
+        ? {m}(inp, i, 1) = "\":
+            +i;
+
+            ? {m}(inp, i, 1) = "n":
+                &r: vbcrlf;
+            :? {m}(inp, i, 1) = "t":
+                &r: vbtab;
+            :
+                &r: {m}(inp, i, 1);
+            ?;
+        :
+            &r: {m}(inp, i, 1);
+        ?;
+
+        +i;
+    ]
+< r;
+
+M();
