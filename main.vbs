@@ -6,16 +6,22 @@ dim directory
 directory = objFile.GetParentFolderName(wscript.ScriptFullName)
 
 sub Main()
-    dim i, element, content, scope, token, result, temp, temp2, statement, funcScope, interpolate, keyword
+    dim i, element, content, scope, token, result, temp, temp2, statement, funcScope, interpolate, keyword, context
     content = objFile.OpenTextFile(wscript.Arguments(0)).ReadAll()
     content = replace(content, vbcrlf, "")
     scope = "code"
     token = "start"
     result = objFile.OpenTextFile(directory & "\initial.vbs").ReadAll()
+    objFile.CreateTextFile(directory & "\output.vbs", true).Write(result)
     statement = ""
     funcScope = ""
+    i = 1
     
-    for i = 1 to len(content)
+    do
+        if i > len(content) then
+            exit do
+        end if
+
         element = mid(content, i, 1)
 
         if scope = "code" then
@@ -55,12 +61,12 @@ sub Main()
                         element = mid(content, i, 1)
                     end if
                 case "^"
-                    if instr("0123456789", mid(content, i + 1, 1)) <> 0 and instr("0123456789", mid(content, i + 2, 1)) <> 0 then
-                        statement = statement & "wscript.arguments(" & mid(content, i + 1, 2) & ")"
-                        i = i + 3
-                    else
-                        statement = statement & "wscript.arguments(" & mid(content, i + 1, 1) & ")"
+                    if mid(content, i + 1, 1) = "^" then
+                        statement = statement & "wscript.arguments"
                         i = i + 2
+                    else
+                        statement = statement & "wscript."
+                        i = i + 1
                     end if
 
                     element = mid(content, i, 1)
@@ -87,75 +93,85 @@ sub Main()
 
         if scope = "code" then
             if element = "{" then
+                context = mid(content, i - 1, 1)
                 keyword = mid(content, i + 1)
                 i = i + instr(keyword, "}") + 1
                 keyword = left(keyword, instr(keyword, "}") - 1)
 
-                select case keyword
-                    case "r"
-                        statement = statement & "run"
-                    case "e"
-                        statement = statement & "exec"
-                    case "sk"
-                        statement = statement & "sendkeys"
-                    case "bp"
-                        statement = statement & "buildpath"
-                    case "cf"
-                        statement = statement & "copyfile"
-                    case "cfd"
-                        statement = statement & "copyfolder"
-                    case "crfd"
-                        statement = statement & "createfolder"
-                    case "ctf"
-                        statement = statement & "createtextfile"
-                    case "df"
-                        statement = statement & "deletefile"
-                    case "dfd"
-                        statement = statement & "deletefolder"
-                    case "de"
-                        statement = statement & "driveexists"
-                    case "fe"
-                        statement = statement & "fileexists"
-                    case "fde"
-                        statement = statement & "folderexists"
-                    case "gapn"
-                        statement = statement & "getabsolutepathname"
-                    case "gbn"
-                        statement = statement & "getbasename"
-                    case "gd"
-                        statement = statement & "getdrive"
-                    case "gdn"
-                        statement = statement & "getdrivename"
-                    case "gen"
-                        statement = statement & "getextensionname"
-                    case "gf"
-                        statement = statement & "getfile"
-                    case "gfn"
-                        statement = statement & "getfilename"
-                    case "gfd"
-                        statement = statement & "getfolder"
-                    case "gpfn"
-                        statement = statement & "getparentfoldername"
-                    case "gsfn"
-                        statement = statement & "getspecialfoldername"
-                    case "gss"
-                        statement = statement & "getstandardstream"
-                    case "gtn"
-                        statement = statement & "gettempname"
-                    case "mf"
-                        statement = statement & "movefile"
-                    case "mfd"
-                        statement = statement & "movefolder"
-                    case "otf"
-                        statement = statement & "opentextfile"
-                    case "ra"
-                        statement = statement & "readall"
-                    case "rl"
-                        statement = statement & "readline"
-                    case "aeos"
-                        statement = statement & "atendofstream"
-                    case "c"
-                        statement = statement & "close"
+                select case context
+                    case "$"
+                        select case keyword
+                            case "r"
+                                statement = statement & "run"
+                            case "e"
+                                statement = statement & "exec"
+                            case "sk"
+                                statement = statement & "sendkeys"
+                        end select
+                    case "#"
+                        select case keyword
+                            case "bp"
+                                statement = statement & "buildpath"
+                            case "cf"
+                                statement = statement & "copyfile"
+                            case "cfd"
+                                statement = statement & "copyfolder"
+                            case "crfd"
+                                statement = statement & "createfolder"
+                            case "ctf"
+                                statement = statement & "createtextfile"
+                            case "df"
+                                statement = statement & "deletefile"
+                            case "dfd"
+                                statement = statement & "deletefolder"
+                            case "de"
+                                statement = statement & "driveexists"
+                            case "fe"
+                                statement = statement & "fileexists"
+                            case "fde"
+                                statement = statement & "folderexists"
+                            case "gapn"
+                                statement = statement & "getabsolutepathname"
+                            case "gbn"
+                                statement = statement & "getbasename"
+                            case "gd"
+                                statement = statement & "getdrive"
+                            case "gdn"
+                                statement = statement & "getdrivename"
+                            case "gen"
+                                statement = statement & "getextensionname"
+                            case "gf"
+                                statement = statement & "getfile"
+                            case "gfn"
+                                statement = statement & "getfilename"
+                            case "gfd"
+                                statement = statement & "getfolder"
+                            case "gpfn"
+                                statement = statement & "getparentfoldername"
+                            case "gsfn"
+                                statement = statement & "getspecialfoldername"
+                            case "gss"
+                                statement = statement & "getstandardstream"
+                            case "gtn"
+                                statement = statement & "gettempname"
+                            case "mf"
+                                statement = statement & "movefile"
+                            case "mfd"
+                                statement = statement & "movefolder"
+                            case "otf"
+                                statement = statement & "opentextfile"
+                        end select
+                    case else
+                        select case keyword
+                            case "ra"
+                                statement = statement & "readall"
+                            case "rl"
+                                statement = statement & "readline"
+                            case "aeos"
+                                statement = statement & "atendofstream"
+                            case "c"
+                                statement = statement & "close"
+                        end select
                 end select
 
                 element = mid(content, i, 1)
@@ -220,6 +236,9 @@ sub Main()
                             case "_"
                                 token = "normal"
                                 statement = "call "
+                            case "@"
+                                token = "import"
+                                statement = ""
                             case else
                                 token = "normal"
                                 statement = statement & element
@@ -404,6 +423,15 @@ sub Main()
                             case else
                                 statement = statement & element
                         end select
+                    case "import"
+                        select case element
+                            case ";"
+                                token = "start"
+                                content = content & objFile.OpenTextFile(objFile.GetParentFolderName(objFile.GetAbsolutePathName(wscript.arguments(0))) & "/" & statement & ".ivvbs").ReadAll()
+                                statement = ""
+                            case else
+                                statement = statement & element
+                        end select
                 end select
             case "string"
                 select case element
@@ -457,7 +485,9 @@ sub Main()
                         statement = statement & element
                 end select
         end select
-    next
+
+        i = i + 1
+    loop
 
     objFile.CreateTextFile(directory & "\output.vbs", true).Write(result)
 end sub

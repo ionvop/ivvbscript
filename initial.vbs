@@ -3,7 +3,7 @@ dim ivvbsobjshell, ivvbsobjfile, ivvbsobjhttp
 set ivvbsobjshell = createobject("wscript.shell")
 set ivvbsobjfile = createobject("scripting.filesystemobject")
 set ivvbsobjhttp = createobject("msxml2.xmlhttp.6.0")
-ivvbsobjshell.currentdirectory = ivvbsobjfile.getparentfolderName(ivvbsobjfile.getabsolutepathname(wscript.arguments(0)))
+ivvbsobjshell.currentdirectory = ivvbsobjfile.getparentfoldername(ivvbsobjfile.getabsolutepathname(wscript.arguments(0)))
 sub ivvbsprint(ivvbsmessage)
 dim ivvbselement
 if typename(ivvbsmessage) = "Variant()" then
