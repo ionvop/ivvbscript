@@ -1,1 +1,1 @@
->P(inp)>i,r;i=1;r="";[?i>{le}(inp):\?;?{m}(inp,i,1)="\":+i;?{m}(inp,i,1)="n":&r:vbcrlf;:?{m}(inp,i,1)="t":&r:vbtab;:&r:{m}(inp,i,1);?;:&r:{m}(inp,i,1);?;+i;]<r;
+>P(inp)>i,r;i=1;r="";[?i>{le}(inp):\?;?{m}(inp,i,1)="\":+i;?{m}(inp,i,1)="n":&r:`\n`;:?{m}(inp,i,1)="t":&r:`\t`;:&r:{m}(inp,i,1);?;:&r:{m}(inp,i,1);?;+i;]<r;
