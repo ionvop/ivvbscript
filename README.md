@@ -253,7 +253,9 @@ var2 = "dog";
 
 Commonly used ActiveX objects and miscellaneous functions in VBScript projects can now be accessed using a special character.
 
-`^` argument
+`^` Wscript
+
+`^^` arguments
 
 `$` WScript.Shell
 
@@ -261,21 +263,24 @@ Commonly used ActiveX objects and miscellaneous functions in VBScript projects c
 
 `#` Scripting.FileSystemObject
 
-`%` modulo operator
-
 `%%` MSXML2.XMLHTTP.6.0
+
+`{<keyword>}` Shorthands. *Refer to source code for definitions*
 
 Example:
 
 ```
 > content;
-content = #opentextfile("test.txt").readall();
+content = #{otf}("test.txt").{#ra}();
 .content;
 
-.^1;
+."Argument 1: "
+.^^0;
+."";
+."Environment variable of ENV"
 .$^("%ENV%");
 
-$run("mspaint");
+${r}("mspaint");
 ```
 
 ## Loop techniques
