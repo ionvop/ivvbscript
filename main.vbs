@@ -265,6 +265,8 @@ sub Main()
                                 statement = statement & "atendofstream"
                             case "#c"
                                 statement = statement & "close"
+                            case "#w"
+                                statement = statement & "write"
                             case "a"
                                 statement = statement & "abs"
                             case "ar"
