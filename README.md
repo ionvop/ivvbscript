@@ -1,6 +1,6 @@
 # ivvbscript (IonVop VBScript)
 
-A transpiler written in VBScript to transpile `.ivvbs` code into `.vbs`
+A transpiler written in VBScript to transpile `.ivvbs` source code into a `.vbs` file.
 
 IVVBScript is an experimental programming language that focuses on hacky syntax at the cost of readability and intuitiveness.
 
