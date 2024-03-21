@@ -12,7 +12,7 @@ IVVBScript is an experimental programming language that focuses on hacky syntax 
 
 ### Variable declaration
 
-Declare a new variable or array variable within a scope.
+Declare a new variable.
 
 `> <variables>;`
 
