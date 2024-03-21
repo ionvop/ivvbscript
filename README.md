@@ -41,7 +41,7 @@ Display a dialogue box message.
 
 `.<value>;`
 
-`message` Message to be displayed.
+`value` Message to be displayed.
 
 Example:
 
@@ -59,9 +59,9 @@ Prompt for user input.
 
 `,<variable>;`
 
-`,<variable> : <prompt>;`
+`,<variable>: <prompt>;`
 
-`variable` The variable to be assigned.
+`variable` The variable in which the user input will be assigned to.
 
 `prompt` The prompt text.
 
@@ -69,8 +69,8 @@ Example:
 
 ```
 > input;
-,input: "Enter your message";
-.input;
+,input: "Enter your name: ";
+."Hello, " & input;
 ```
 
 ### If Then
@@ -95,14 +95,16 @@ Example:
 
 ```
 > input;
-,input: "What's 9 + 10?";
+,input: "Enter a number: ";
 
-? input = 21:
-    ."You stupid";
-:? input = 19:
-    ."Correct";
+? input % 3 = 0 && input % 5 = 0:
+    ."fizzbuzz";
+:? input % 3 = 0:
+    ."fizz";
+:? input % 5 = 0:
+    ."buzz";
 :
-    ."Wrong";
+    .input;
 ?;
 ```
 
@@ -118,11 +120,11 @@ Define a function procedure.
 
 `name` The name of the function.
 
-`parameters` Argument variabless passed to the function, comma separated.
+`parameters` Argument variables passed to the function, comma separated.
 
 `statements` Program code.
 
-`value` The value to return.
+`value` The value to be returned.
 
 Example:
 
@@ -182,21 +184,21 @@ Repeat a block of statements.
 ```
 [
     <statements>
-    /
+    \
 ]
 ```
 
-`statements` Program code to be repeated until `/` is called.
+`statements` Program code to be repeated until `\` is called.
 
 ### Resize array
 
 Resize the size of an array while preserving its elements.
 
-`>> <array_name>(<new_size>)`
+`>> <array_name>(<new_size>);`
 
 `array_name` Name of the array to be resized
 
-`new_size` The new size of the array
+`new_size` The new upper bound of the array
 
 Example:
 
@@ -213,7 +215,9 @@ arr(2) = "banana";
 
 Stop the execution and print a message.
 
-`!<message>`
+`!;`
+
+`!<message>;`
 
 `message` Message to be displayed.
 
@@ -275,7 +279,7 @@ content = #{otf}("test.txt").{#ra}();
 .content;
 
 ."Argument 1: "
-.^^0;
+.^^(0);
 ."";
 ."Environment variable of ENV"
 .$^("%ENV%");
@@ -287,12 +291,12 @@ ${r}("mspaint");
 
 ### While
 
-Conditionally repeat a block of statements.
+Conditionally repeat a block of statements until the condition is true.
 
 ```
 [
-    ? <condition>::
-        /
+    ? <condition>:
+        \
     ?;
     
     <statements>
@@ -305,11 +309,11 @@ Repeat a block of statements a given number of times.
 
 ```
 > <counter>;
-<counter> = initialValue;
+<counter> = <initialValue>;
 
 [
-    ? <condition>::
-        /;
+    ? <counter> > <finalValue>:
+        \
     ?;
     
     <statements>
