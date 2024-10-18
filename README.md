@@ -4,6 +4,8 @@ A transpiler written in VBScript to transpile `.ivvbs` source code into a `.vbs`
 
 IVVBScript is an experimental programming language that focuses on hacky syntax at the cost of readability and intuitiveness.
 
+**Deprecated in favor of [ivpy](https://github.com/ionvop/ivpy)**
+
 ## Usage
 
 `ivvbs "path\to\file.ivvbs"`
